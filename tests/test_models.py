@@ -204,6 +204,21 @@ class TestProductModel(unittest.TestCase):
         for product in found:
             self.assertEqual(product.price, price)
 
+    def test_find_by_price_string(self):
+        """Test it should FIND products by PRICE as a STRING"""
+        products = ProductFactory.create_batch(5)
+        price = Decimal("10.99")
+        for product in products:
+            product.create()
+        products[0].price = price
+        products[3].price = price
+        price_string = '"10.99"'
+        count = len([product for product in products if product.price == price])
+        found = Product.find_by_price(price_string)
+        self.assertEqual(found.count(), count)
+        for product in found:
+            self.assertEqual(product.price, price)
+
     ######################################################################
     #  Sad paths
     ######################################################################
