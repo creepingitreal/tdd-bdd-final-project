@@ -190,6 +190,20 @@ class TestProductModel(unittest.TestCase):
         for product in found:
             self.assertEqual(product.category, category)
 
+    def test_find_by_price(self):
+        """Test it should FIND products by PRICE"""
+        products = ProductFactory.create_batch(5)
+        for product in products:
+            product.create()
+        products[0].price = Decimal("10.99")
+        products[3].price = Decimal("10.99")
+        price = Decimal("10.99")
+        count = len([product for product in products if product.price == price])
+        found = Product.find_by_price(price)
+        self.assertEqual(found.count(), count)
+        for product in found:
+            self.assertEqual(product.price, price)
+
     ######################################################################
     #  Sad paths
     ######################################################################
@@ -199,16 +213,16 @@ class TestProductModel(unittest.TestCase):
         product.id = None
         product.create()
         product.id = None
-        with self.assertRaises(DataValidationError) as context:
+        with self.assertRaises(DataValidationError):
             product.update()
             self.assertEqual(DataValidationError, "Update called with empty ID field")
-      
+
     def test_deserialize_invalid_boolean(self):
         """Test it should raise a ValidationError for INVALID BOOLEAN when Deserialized"""
         data = {
             "name": "Product 1",
             "description": "Description of Product 1",
-            "price": "10.99", 
+            "price": "10.99",
             "available": "yes"
         }
         product = ProductFactory()
@@ -221,7 +235,7 @@ class TestProductModel(unittest.TestCase):
         data = {
             "name": "Product 1",
             "description": "Description of Product 1",
-            "price": "10.99", 
+            "price": "10.99",
             "available": True,
             "category": "invalid_category"
         }
@@ -229,12 +243,12 @@ class TestProductModel(unittest.TestCase):
         with self.assertRaises(DataValidationError) as context:
             product.deserialize(data)
         self.assertIn("Invalid attribute", str(context.exception))
-        
+
     def test_deserialize_invalid_product(self):
         """Test it should raise a ValidationError for INVALID PRODUCT when Deserialized"""
         data = {
             "description": "Description of Product 1",
-            "price": "10.99", 
+            "price": "10.99",
             "available": True,
         }
         product = ProductFactory()
@@ -243,7 +257,7 @@ class TestProductModel(unittest.TestCase):
         self.assertIn("Invalid product", str(context.exception))
 
     def test_deserialize_invalid_data(self):
-        """Test it should raise a ValidationError for INVALID PRODUCT when Deserialized"""
+        """Test it should raise a ValidationError for INVALID DATA when Deserialized"""
         invalid_data = "this is not a product"
         product = ProductFactory()
         with self.assertRaises(DataValidationError) as context:
