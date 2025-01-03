@@ -203,7 +203,7 @@ class TestProductModel(unittest.TestCase):
             product.update()
             self.assertEqual(DataValidationError, "Update called with empty ID field")
       
-    def test_deserialize_invalid_boolean_available(self):
+    def test_deserialize_invalid_boolean(self):
         """Test it should raise a ValidationError for INVALID BOOLEAN when Deserialized"""
         data = {
             "name": "Product 1",
@@ -212,10 +212,40 @@ class TestProductModel(unittest.TestCase):
             "available": "yes"
         }
         product = ProductFactory()
-        product.create()
         with self.assertRaises(DataValidationError) as context:
             product.deserialize(data)
         self.assertEqual(str(context.exception),  "Invalid type for boolean [available]: <class 'str'>")
+
+    def test_deserialize_invalid_attribute(self):
+        """Test it should raise a ValidationError for INVALID ATTRIBUTE when Deserialized"""
+        data = {
+            "name": "Product 1",
+            "description": "Description of Product 1",
+            "price": "10.99", 
+            "available": True,
+            "category": "invalid_category"
+        }
+        product = ProductFactory()
+        with self.assertRaises(DataValidationError) as context:
+            product.deserialize(data)
+        self.assertIn("Invalid attribute", str(context.exception))
         
- 
-    
+    def test_deserialize_invalid_product(self):
+        """Test it should raise a ValidationError for INVALID PRODUCT when Deserialized"""
+        data = {
+            "description": "Description of Product 1",
+            "price": "10.99", 
+            "available": True,
+        }
+        product = ProductFactory()
+        with self.assertRaises(DataValidationError) as context:
+            product.deserialize(data)
+        self.assertIn("Invalid product", str(context.exception))
+
+    def test_deserialize_invalid_data(self):
+        """Test it should raise a ValidationError for INVALID PRODUCT when Deserialized"""
+        invalid_data = "this is not a product"
+        product = ProductFactory()
+        with self.assertRaises(DataValidationError) as context:
+            product.deserialize(invalid_data)
+        self.assertIn("Invalid product: body of request", str(context.exception))
