@@ -31,17 +31,10 @@ class ProductFactory(factory.Factory):
         model = Product
 
     id = factory.Sequence(lambda n: n)
-   ## Add code to create Fake Products 
+    # Add code to create Fake Products
 
-class ProductFactory(factory.Factory):
-    
-    class Meta:
-    
-        model = Product
-    
-    id = factory.Sequence(lambda n: n)
     name = FuzzyChoice(
-        choices = [
+        choices=[
             "Hat",
             "Pants",
             "Shirt",

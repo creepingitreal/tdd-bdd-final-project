@@ -27,7 +27,7 @@ import os
 import logging
 import unittest
 from decimal import Decimal
-from service.models import Product, Category, db
+from service.models import Product, Category, db, DataValidationError
 from service import app
 from tests.factories import ProductFactory
 
@@ -135,12 +135,12 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(products[0].name, "test_name")
 
     def test_delete_product(self):
-            """Test it should DELETE a product"""
-            product = ProductFactory()
-            product.create()
-            self.assertEqual(len(Product.all()), 1)
-            product.delete()
-            self.assertEqual(len(Product.all()), 0)
+        """Test it should DELETE a product"""
+        product = ProductFactory()
+        product.create()
+        self.assertEqual(len(Product.all()), 1)
+        product.delete()
+        self.assertEqual(len(Product.all()), 0)
 
     def test_list_all_products(self):
         """Test it should LIST ALL products in database"""
@@ -177,4 +177,45 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(found.count(), count)
         for product in found:
             self.assertEqual(product.available, available)
+
+    def test_find_by_category(self):
+        """Test it should FIND a product BY CATEGORY"""
+        products = ProductFactory.create_batch(10)
+        for product in products:
+            product.create()
+        category = products[0].category
+        count = len([product for product in products if product.category == category])
+        found = Product.find_by_category(category)
+        self.assertEqual(found.count(), count)
+        for product in found:
+            self.assertEqual(product.category, category)
+
+    ######################################################################
+    #  Sad paths
+    ######################################################################
+    def test_update_with_bad_id_called(self):
+        """Test it should raise a ValidationError when Updated with EMPTY ID"""
+        product = ProductFactory()
+        product.id = None
+        product.create()
+        product.id = None
+        with self.assertRaises(DataValidationError) as context:
+            product.update()
+            self.assertEqual(DataValidationError, "Update called with empty ID field")
+      
+    def test_deserialize_invalid_boolean_available(self):
+        """Test it should raise a ValidationError for INVALID BOOLEAN when Deserialized"""
+        data = {
+            "name": "Product 1",
+            "description": "Description of Product 1",
+            "price": "10.99", 
+            "available": "yes"
+        }
+        product = ProductFactory()
+        product.create()
+        with self.assertRaises(DataValidationError) as context:
+            product.deserialize(data)
+        self.assertEqual(str(context.exception),  "Invalid type for boolean [available]: <class 'str'>")
         
+ 
+    
