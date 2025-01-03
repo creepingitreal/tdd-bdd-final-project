@@ -42,16 +42,16 @@ id = factory.Sequence(lambda n: n)
 name = FuzzyChoice(
     choices = [
         "Hat",
-            "Pants",
-            "Shirt",
-            "Apple",
-            "Banana",
-            "Pots",
-            "Towels",
-            "Ford",
-            "Chevy",
-            "Hammer",
-            "Wrench"
+        "Pants",
+        "Shirt",
+        "Apple",
+        "Banana",
+        "Pots",
+        "Towels",
+        "Ford",
+        "Chevy",
+        "Hammer",
+        "Wrench"
     ]
 )
 description = factory.Faker("text")
@@ -60,7 +60,7 @@ available = FuzzyChoice(choices=[True, False])
 category = FuzzyChoice(
     choices=[
         Category.UNKNOWN,
-            Category.CLOTHS,
+            Category.CLOTHES,
             Category.FOOD,
             Category.HOUSEWARES,
             Category.AUTOMOTIVE,
