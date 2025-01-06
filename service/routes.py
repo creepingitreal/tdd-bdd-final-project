@@ -90,7 +90,6 @@ def create_products():
     # Uncomment this line of code once you implement READ A PRODUCT
     #
     location_url = url_for("get_products", product_id=product.id, _external=True)
-    location_url = "/"  # delete once READ is implemented
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
 
 
@@ -121,7 +120,7 @@ def get_products(product_id):
 ######################################################################
 # U P D A T E   A   P R O D U C T
 ######################################################################
-@app.route("/products/<int:product_id>", methods=["GET"])
+@app.route("/products/<int:product_id>", methods=["PUT"])
 def update_product(product_id):
     """It should update an existing product"""
     app.logger.info("Request to update existing product with id [%s]", product_id)
@@ -129,17 +128,23 @@ def update_product(product_id):
 
     product = Product.find(product_id)
     if not product:
-        abort(status.HTTP_404_NOT_FOUND)
+        abort(status.HTTP_404_NOT_FOUND, f"Product with id '{product_id}' was not found.")
 
-    product.deserialize(response.get_json())
+    product.deserialize(request.get_json())
+    product.id = product_id
     product.update()
     return product.serialize(), status.HTTP_200_OK
 
 ######################################################################
 # D E L E T E   A   P R O D U C T
 ######################################################################
+@app.route("/products/<int:product_id>", methods=["DELETE"])
+def delete_a_product(product_id):
+    """It should delete an existing product"""
+    app.logger.info("Request to delete a product with id [%s]", product_id)
+    
+    product = Product.find(product_id)
+    if product:
+        product.delete()
 
-
-#
-# PLACE YOUR CODE TO DELETE A PRODUCT HERE
-#
+    return "", status.HTTP_204_NO_CONTENT

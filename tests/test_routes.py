@@ -180,21 +180,36 @@ class TestProductRoutes(TestCase):
         response = self.client.get(f"{BASE_URL}/{invalid_id}")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    # def test_update_product(self):
-    #     """It should update an exisiting Product"""
-    #     # create a product
-    #     test_product = ProductFactory()
-    #     response = self.client.post(BASE_URL, json=test_product.serialize())
-    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    def test_update_product(self):
+        """It should update an exisiting Product"""
+        # create a product
+        test_product = ProductFactory()
+        response = self.client.post(BASE_URL, json=test_product.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         
-    #     # update product
-    #     new_product = response.get_json()
-    #     new_product["description"] = "testing description update"
-    #     response = self.client.put(f"{BASE_URL}/{new_product['id']}", json=new_product)
-    #     new_product.update()
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     updated_product = response.get_json()
-    #     self.assertEqual(updated_product["description"], "testing description update")
+        # update product
+        new_product = response.get_json()
+        new_product["description"] = "testing description update"
+        response = self.client.put(f"{BASE_URL}/{new_product['id']}", json=new_product)
+        new_product.update()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_product = response.get_json()
+        self.assertEqual(updated_product["description"], "testing description update")
+
+    def test_delete_product(self):
+        """It should Delete a Product"""
+        products = self._create_products(5)
+        count = self.get_product_count()
+        test_product = products[0]
+        response = self.client.delete(f"{BASE_URL}/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.get_json()), 0)
+
+        # check count is less one
+        response = self.client.get(f"{BASE_URL}/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        new_count = self.get_product_count()
+        self.assertEqual(new_count, count - 1)
 
     ######################################################################
     # Utility functions
