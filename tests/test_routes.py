@@ -217,15 +217,15 @@ class TestProductRoutes(TestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(response.data), 0)
 
-    ######################################################################
-    # LIST PRODUCTS
-    ######################################################################
         # check count is less one
         response = self.client.get(f"{BASE_URL}/{test_product.id}")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         new_count = self.get_product_count()
         self.assertEqual(new_count, count - 1)
 
+    ######################################################################
+    # LIST PRODUCTS
+    ######################################################################
     def test_list_all_products(self):
         """It should GET a list of ALL products"""
         self._create_products(5)
