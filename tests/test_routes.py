@@ -167,6 +167,9 @@ class TestProductRoutes(TestCase):
     #
     # ADD YOUR TEST CASES HERE
     #
+    ######################################################################
+    # READ A PRODUCT
+    ######################################################################
     def test_get_product(self):
         """It should GET a SINGLE Product"""
         test_product = self._create_products(1)[0]
@@ -183,6 +186,9 @@ class TestProductRoutes(TestCase):
         data = response.get_json()
         self.assertIn("was not found", data["message"])
 
+    ######################################################################
+    # UPDATE AN EXISTING PRODUCT
+    ######################################################################
     def test_update_product(self):
         """It should UPADTE an exisiting Product"""
         # create a product
@@ -199,6 +205,9 @@ class TestProductRoutes(TestCase):
         updated_product = response.get_json()
         self.assertEqual(updated_product["description"], "testing description update")
 
+    ######################################################################
+    # DELETE AN EXISTING PRODUCT
+    ######################################################################
     def test_delete_product(self):
         """It should DELETE a Product"""
         products = self._create_products(5)
@@ -208,6 +217,9 @@ class TestProductRoutes(TestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(response.data), 0)
 
+    ######################################################################
+    # LIST PRODUCTS
+    ######################################################################
         # check count is less one
         response = self.client.get(f"{BASE_URL}/{test_product.id}")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
